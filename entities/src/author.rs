@@ -11,6 +11,43 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::post::Entity",
+        from = "Column::Id",
+        to = "super::post::Column::AuthorId"
+    )]
+    Posts1,
+    #[sea_orm(
+        belongs_to = "super::post::Entity",
+        from = "Column::Id",
+        to = "super::post::Column::Author2Id"
+    )]
+    Posts2,
+}
+
+#[derive(Debug)]
+pub struct AuthorToPost1;
+
+impl Linked for AuthorToPost1 {
+    type FromEntity = Entity;
+    type ToEntity = super::post::Entity;
+
+    fn link(&self) -> Vec<sea_orm::LinkDef> {
+        vec![Relation::Posts1.def()]
+    }
+}
+
+#[derive(Debug)]
+pub struct AuthorToPost2;
+
+impl Linked for AuthorToPost2 {
+    type FromEntity = Entity;
+    type ToEntity = super::post::Entity;
+
+    fn link(&self) -> Vec<sea_orm::LinkDef> {
+        vec![Relation::Posts2.def()]
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

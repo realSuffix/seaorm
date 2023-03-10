@@ -1,6 +1,9 @@
 use axum::{extract::State, routing::get, Router};
-use entities::author;
-use sea_orm::{prelude::Uuid, Database, DatabaseConnection, EntityTrait};
+#[allow(unused_imports)]
+use entities::author::{self, AuthorToPost1, AuthorToPost2};
+use sea_orm::{
+    prelude::Uuid, Database, DatabaseConnection, EntityTrait, ModelTrait,
+};
 
 #[derive(Clone)]
 struct AppState {
@@ -24,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn test(State(state): AppStateExtract) -> &'static str {
-    let author_id = Uuid::parse_str("0c8896b0-5b28-4ea1-b4d1-38921385e0fc").unwrap();
+    let author_id = Uuid::parse_str("a42a2ab9-682a-4ed0-91ad-cf7bafc27c86").unwrap();
 
     let author = author::Entity::find_by_id(author_id)
         .one(&state.conn)
@@ -32,7 +35,13 @@ async fn test(State(state): AppStateExtract) -> &'static str {
         .unwrap()
         .unwrap();
 
-    println!("{author:#?}");
+    let posts1 = author
+        .find_linked(AuthorToPost2)
+        .all(&state.conn)
+        .await
+        .unwrap();
+
+    println!("{posts1:#?}");
 
     "hello world"
 }

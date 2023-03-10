@@ -2,8 +2,6 @@
 
 use sea_orm::entity::prelude::*;
 
-use crate::{author, post};
-
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
 #[sea_orm(table_name = "post")]
 pub struct Model {
@@ -33,6 +31,30 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Author1,
+}
+
+#[derive(Debug)]
+pub struct Post1ToAuthor;
+
+impl Linked for Post1ToAuthor {
+    type FromEntity = Entity;
+    type ToEntity = super::author::Entity;
+
+    fn link(&self) -> Vec<sea_orm::LinkDef> {
+        vec![Relation::Author1.def()]
+    }
+}
+
+#[derive(Debug)]
+pub struct Post2ToAuthor;
+
+impl Linked for Post2ToAuthor {
+    type FromEntity = Entity;
+    type ToEntity = super::author::Entity;
+
+    fn link(&self) -> Vec<sea_orm::LinkDef> {
+        vec![Relation::Author2.def()]
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {}
